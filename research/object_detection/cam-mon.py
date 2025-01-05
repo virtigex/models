@@ -1,4 +1,5 @@
 # coding: utf-8
+import sys
 import numpy as np
 import os
 import six.moves.urllib as urllib
@@ -12,7 +13,15 @@ from optparse import OptionParser
 
 import cv2
 
-CAMERA_ID = 0
+args = sys.argv.copy()
+
+progname = args.pop(0)
+
+if len(args) != 1:
+    print(f'usage: {progname} <camid>')
+    exit(-1)
+
+camera_id = int(args[0])
 
 # What model to download.
 MODEL_NAME = 'ssd_mobilenet_v1_coco_11_06_2017'
@@ -37,7 +46,7 @@ def load_image_into_numpy_array(image):
         (im_height, im_width, 3)).astype(np.uint8)
 
 def classify_live_image(callback, savedir=None, freq=10, displayoff=False):
-    cap = cv2.VideoCapture(CAMERA_ID)
+    cap = cv2.VideoCapture(camera_id)
 
     # ## Download Model
     if not os.path.isfile(MODEL_FILE):
@@ -69,8 +78,6 @@ def classify_live_image(callback, savedir=None, freq=10, displayoff=False):
     # Label maps map indices to category names, so that when our convolution network predicts `5`, we know that this corresponds to `airplane`.  Here we use internal utility functions, but anything that returns a dictionary mapping integers to appropriate string labels would be fine
 
     label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
-    #label_map = label_map_u StringIntLabelMap().ParseFromString(tf.gfile.GFile(PATH_TO_LABELS, 'rb').read())
-    #label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
     categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES,
                                                                 use_display_name=True)
     category_index = label_map_util.create_category_index(categories)
